@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5.22.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.2.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.20.8"></script>
+</head>
+<body>
+  <div id="vis"/>
+  <script>
+    const spec = {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "data": {
+    "url": "https://raw.githubusercontent.com/Thanawin16/vega-lite/main/district.json.json",
+    "format": {"type": "topojson", "feature": "geodata"}
+  },
+  "transform": [
+    {
+      "lookup": "properties.dcode",
+      "from": {
+        "data": {
+          "url": "https://raw.githubusercontent.com/Thanawin16/vega-lite/main/hospital_bma-23.csv"
+        },
+        "key": "dcode",
+        "fields": ["bed_61"]
+      }
+    }
+  ],
+  "hconcat": [
+    {
+      "width": 300,
+      "height": 300,
+      "projection": {"type": "Mercator"},
+      "mark": {"type": "geoshape"},
+      "encoding": {
+        "color": {"field": "bed_61", "type": "quantitative"},
+        "opacity": {"condition": {"param": "pts", "value": "1"}, "value": 0.3}
+      }
+    },
+    {
+      "width": 300,
+      "height": 300,
+      "mark": "bar",
+      "params": [
+        {
+          "name": "pts",
+          "select": {"type": "point", "encodings": ["x"], "on": "mouseover"}
+        }
+      ],
+      "encoding": {
+        "x": {"field": "properties.dcode", "type": "nominal"},
+        "y": {"field": "bed_61", "type": "quantitative"},
+        "color": {"field": "bed_61", "type": "quantitative"},
+        "opacity": {"condition": {"param": "pts", "value": 1}, "value": 0.5}
+      }
+    }
+  ],
+  "config": {}
+};
+    vegaEmbed("#vis", spec, {mode: "vega-lite"}).then(console.log).catch(console.warn);
+  </script>
+</body>
+</html>
